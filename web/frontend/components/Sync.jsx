@@ -10,6 +10,7 @@ export function Sync() {
     const response = await fetch("/api/datasync", {
       method: "POST",
     });
+    console.log(response);
   };
   return (
     <LegacyCard

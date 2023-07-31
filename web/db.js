@@ -1,16 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://zddababgomdjevjhgcyg.supabase.co";
+const supabaseUrl = "Enter Supabase URL";
 const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkZGFiYWJnb21kamV2amhnY3lnIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODk4NzY2MzIsImV4cCI6MjAwNTQ1MjYzMn0.JTiwALcWS1gcBZXY9oaYHAh_hfOJGMNWP8ENve7ZzIM";
+  "Enter Supabase API Key";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function createStoreEntry(id, temp) {
+async function createStoreEntry(id, storeName) {
   console.log("Creating store entry");
   console.log(id);
   const { data, error } = await supabase
     .from("stores")
-    .insert([{ id: id }], { returning: "minimal" });
+    .insert([{ id: id ,shop_name:storeName}], { returning: "minimal" });
   if (error) {
     console.log(error);
   }
@@ -23,9 +23,9 @@ async function createProductEntry(storeId, productJson, productEmbedding) {
   const { data, error } = await supabase
     .from("products")
     .insert([
-      { embedding: productEmbedding, product: productJson, store_id: storeId },
-    ])
-    .select();
+      { product: productJson, store_id: storeId, embedding: productEmbedding },
+    ]);
+    //.select();
   if (error) {
     console.log(error);
   }

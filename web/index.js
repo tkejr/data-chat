@@ -3,7 +3,8 @@ import { join } from "path";
 import { readFileSync } from "fs";
 import express from "express";
 import serveStatic from "serve-static";
-
+import fs from "fs";
+import csvjson from "csvjson";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
@@ -52,14 +53,64 @@ app.post("/api/datasync", async (_req, res) => {
   const productData = await shopify.api.rest.Product.all({
     session: session,
   });
+  const customerData=await shopify.api.rest.Customer.all({
+    session: session,
+  });
 
+  const orderData=await shopify.api.rest.Order.all({
+    session: session,
+  });
+  // var data=JSON.parse(JSON.stringify(productData.data));
+  // var jsonContent=JSON.stringify(data);
+
+
+  //Convert array to csv file
+   const productCsvData=csvjson.toCSV(productData.data,{
+    Headers:'key'
+  });
+  // const orderCsvData=csvjson.toCSV(orderData.data,{
+  //   Headers:'key'
+  // });
+  // const customerCsvData=csvjson.toCSV(customerData.data,{
+  //   Headers:'key'
+  // });
+
+
+  fs.writeFile('./productsDetails.csv',productCsvData,(err)=>{
+    if(err){
+      console.error(err);
+      //throw new Error();
+    }
+    console.log("Converted Successfully!!!")
+  })
+
+
+  fs.writeFile('./ordersDetails.csv',orderCsvData,(err)=>{
+    if(err){
+      console.error(err);
+      //throw new Error();
+    }
+    console.log("Converted Successfully!!!")
+  })
+  fs.writeFile('./customersDetails.csv',customerCsvData,(err)=>{
+    if(err){
+      console.error(err);
+      //throw new Error();
+    }
+    console.log("Converted Successfully!!!")
+  })
   const deets = await getShopDetails(session);
   const shopId = deets.id;
-  // const createdEntry = await createStoreEntry(shopId, "test");
-  const embeddings = await getEmbeddings(productData.data);
+  const shopName=deets.name;
+  const createdEntry = await createStoreEntry(shopId, shopName);
+  const dd=productData.data[0];
+  const cc=JSON.stringify(productData.data[0], null, 0);
+  const filterData=productData.data.filter((val)=>!(val.images));
+  console.log(JSON.stringify(productData.data));
+  const embeddings = await getEmbeddings(cc);
   console.log(embeddings);
   for (const product of productData.data) {
-    const embeddings = await getEmbeddings(JSON.stringify(product));
+    const embeddings = await getEmbeddings(JSON.stringify(product, null, 0));
     const createdEntry = await createProductEntry(shopId, product, embeddings);
   }
 

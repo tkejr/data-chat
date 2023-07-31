@@ -2,9 +2,10 @@ import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
 
 const configuration = new Configuration({
-  apiKey: "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",
+  apiKey: "Enter Your API Key",
 });
 const openai = new OpenAIApi(configuration);
+
 
 export async function getEmbeddings(data) {
   console.log("Getting embeddings");
@@ -22,7 +23,7 @@ export async function getEmbeddings(data) {
   }
 }
 
-export async function chatCompletion(prompt, message) {
+export async function chatCompletion(prompt) {
   try {
     const completionResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
